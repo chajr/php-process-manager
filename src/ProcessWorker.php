@@ -68,34 +68,31 @@ class ProcessWorker
         $this->handlers = array_replace($this->signalHandler(), $this->process->signalHandler());
         $this->isRunning = true;
 
-        declare(ticks=1);
+        declare(ticks = 1);
 
         $pid = pcntl_fork();
 
         if ($pid === -1) {
-            die("could not fork");
+            die('Could not fork.' . PHP_EOL);
         } elseif ($pid) {
-            echo 'MASTER: ' . getmypid() . "; $pid" . PHP_EOL;
-            exit(); // we are the parent
+            exit();
         } else {
             $this->pid = getmypid();
-            echo 'child: ' . getmypid() . PHP_EOL;
-            // we are the child
         }
 
-        // detatch from the controlling terminal
-        if (posix_setsid() == -1) {
-            die("could not detach from terminal");
+        // detach from the controlling terminal
+        if (posix_setsid() === -1) {
+            die('Could not detach from terminal.' . PHP_EOL);
         }
 
         $this->registerHandlers();
-//        dump(getmypid());
 
         while (true) {
             $this->process->exec();
             usleep($this->interval * 1000);
 
             if ($this->stop) {
+                echo 'Stopped from script.' . PHP_EOL;
                 break;
             }
         }
