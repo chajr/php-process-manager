@@ -69,16 +69,16 @@ class ProcessWorker
         $this->isRunning = true;
 
         declare(ticks = 1);
-
         $pid = pcntl_fork();
 
         if ($pid === -1) {
             die('Could not fork.' . PHP_EOL);
-        } elseif ($pid) {
+        } 
+        if ($pid) {
             exit();
-        } else {
-            $this->pid = getmypid();
         }
+
+        $this->pid = getmypid();
 
         // detach from the controlling terminal
         if (posix_setsid() === -1) {
